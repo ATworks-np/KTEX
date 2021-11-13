@@ -1,0 +1,91 @@
+#container {
+    display: grid; /* グリッドレイアウト */
+    grid-template-rows: 200px 1fr 100px repeat(6, 20px 110px);
+    grid-template-columns: 1500px 1fr;
+    grid-template-areas:
+        " head1 head2 "
+        "news news"
+        "tab area0"
+        "tab area1a"
+        "tab area1b"
+        "tab area1c"
+        "tab area1d"
+        "tab area2a"
+        "tab area2b"
+        "tab area2c"
+        "tab area2d"
+        "tab area3a"
+        "tab area3b"
+        "tab area4a"
+        "tab area4b";
+    grid-column-gap: 100px;
+}
+#loading{
+  grid-area: head1;
+  justify-self: right;
+}
+#head1 {
+  grid-area: head1;
+  /*background-image: linear-gradient(90deg, #FFFFFF,#00fffa);*/
+}
+#head2 {
+  grid-area: head2;
+  /*background-image: linear-gradient(90deg, #FFFFFF,#00fffa);*/
+}
+#news {
+  grid-area: news;
+}
+#tab {
+  grid-area: tab;
+}
+#apply {
+    grid-area: area0;
+    justify-self: left;
+}
+#run {
+    grid-area: area3b;
+    justify-self: left;
+}
+#CubeValue {
+    grid-area: area1b;
+}
+#seekbar-Cube {
+    grid-area: area1a;
+}
+#CubeSpread {
+    grid-area: area1d;
+}
+#seekbar-Cube-S {
+    grid-area: area1c;
+}
+#seekbar-S {
+    grid-area: area2a;
+}
+#SSpread {
+    grid-area: area2d;
+}
+#seekbar-S-S {
+    grid-area: area2c;
+}
+#SValue {
+    grid-area: area2b;
+}
+#RandValue {
+    grid-area: area3a;
+}
+#result {
+    grid-area: area3b;
+}
+#containerEuler{
+  display: grid; /* グリッドレイアウト */
+  grid-template-rows: 700px 100px;
+  grid-template-columns: 1000px;
+  grid-template-areas: "plot"
+                       "push";
+}
+#eulerPlot{
+  grid-area: plot;
+}
+#eulerDownload{
+  grid-area: push;
+}

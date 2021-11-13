@@ -1,0 +1,202 @@
+<html>
+<head>
+  <title>KTEX</title>
+  <link rel="shortcut icon" href="favicon.ico" type="./favicon.ico">
+  <!-- Plotly.js -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG">
+  </script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+  <meta http-equiv=”Pragma” content=”no-cache”>
+  <script type="text/javascript" src="./js/fakeLoader.min.js"></script>
+  <script type="text/javascript" src="./js/jquery-1.11.2.min.js"></script>
+  <script type="text/javascript" src="./js/seekbar.js"></script>
+  <script type="text/javascript" src="./js/plot.js"></script>
+  <script type="text/javascript" src="./js/rnorm.js"></script>
+  <script type="text/javascript">
+    window.onload = function(){
+      $(function() {
+        $("#loading").fadeOut(1000);
+      });
+    }
+    function run(){
+      var json=({'volume':2000,
+                'cube'   :{'volume':document.getElementById("CubeVolume").value,
+                           'spread':Math.sqrt(document.getElementById('CubeSpread').value)},
+                 's'     :{'volume':document.getElementById("SVolume").value,
+                           'spread':Math.sqrt(document.getElementById('SSpread').value),
+                           'color':"rgba(0, 0, 0, 0.5)"},
+                 'random':{'volume':document.getElementById("RandVolume").value},
+                 'k':50
+                })
+      conf=json;
+      var tex = geTex(json);
+      var polar = stereographic(tex,json);
+
+      texbuf=tex;
+      drawTex(tex);
+      drawPolar(polar);
+      //drawODF(tex);
+      return polar;
+    }
+    $(function(){
+      $('#apply').on('click',function(){
+        $("#loading").fadeIn();
+        var polar = run();
+        post(polar);
+      });
+    });
+    function post(polar){
+      $.ajax({
+      	url : '/cgi-bin/post.py',
+      	type : 'POST',
+      	data : { enc_json : JSON.stringify(polar.selected) },
+        success: function(data) {
+          //console.log(data);
+        },
+        error:function() {
+           console.log("error");
+        }
+      });
+    }
+    function callback(json) {
+      console.log("run")
+    }
+    function SSback(json) {
+      drawSS(json);
+      $("#loading").fadeOut();
+    }
+    function caluc() {
+      var s = document.createElement('script');
+      s.src = '/cgi-bin/NN.py';
+      document.body.appendChild(s);
+      return false;
+    }
+    function sleep(waitMsec) {
+      var startMsec = new Date();
+      while (new Date() - startMsec < waitMsec);
+    }
+
+    function down(){
+      var resultJson = JSON.stringify(texbuf)+JSON.stringify(conf);
+      var downLoadLink = document.createElement("a");
+      downLoadLink.download = "texture.txt";
+      downLoadLink.href = URL.createObjectURL(new Blob([resultJson], {type: "text.plain"}));
+      downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+      downLoadLink.click();
+    }
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="./css/seekbar.css"/>
+  <link rel="stylesheet" type="text/css" href="./css/tab.css"/>
+  <link rel="stylesheet" type="text/css" href="./css/layout.css">
+  <link rel="stylesheet" type="text/css" href="./css/slider.css">
+  <link rel="stylesheet" type="text/css" href="./css/bottn.css">
+  <link rel="stylesheet" type="text/css" href="./css/fakeLoader.css"/>
+
+
+</head>
+
+<body>
+  <div id='fakeloader_1'  class="fakeloader"></div>
+  <style>
+  .absolute {
+      position: absolute;
+      left: 1800px;
+      top: 250px;
+  }
+  </style>
+  <div id="container"> <!-- コンテナ -->
+    <div id="loading"><img src="./gif-load.gif" class="absolute"></div>
+    <!-- HEAD -->
+    <div id="head1">
+      <img src="./icon.png"  style="width:700px;height:200px">
+    </div>
+    <div id="head2">
+      <p>version 0.2.0 - krep </p>
+    </div>
+    <!-- BODY -->
+    <div id="news">
+    <!-- 折り畳み展開ポインタ -->
+      <div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
+      <a style="cursor:pointer;"> News </a>
+      </div>
+      <!--// 折り畳まれ部分 -->
+        <div id="open" style="display:none;clear:both;">
+        <p>@version 0.20 released: you becomes able to use "polar figure".</p>
+        <p>@version 0.10 released: KTEX releaded.</p>
+      </div>
+    </div>
+    <div id="tab">
+      <div class="tabs">
+        <!-- Tab -->
+        <input id="all" type="radio" name="tab_item" checked>
+        <label class="tab_item" for="all">Euler</label>
+
+        <input id="programming" type="radio" name="tab_item">
+        <label class="tab_item" for="programming">Pole</label>
+
+        <input id="design" type="radio" name="tab_item">
+        <label class="tab_item" for="design">ODF</label>
+
+        <input id="SS" type="radio" name="tab_item">
+        <label class="tab_item" for="SS">SS curve</label>
+
+        <input id="Yield" type="radio" name="tab_item">
+        <label class="tab_item" for="Yield">Yield</label>
+        <!-- Tab contents -->
+        <div class="tab_content" id="all_content">
+          <div id="containerEuler">
+            <div id="eulerPlot">
+            </div>
+            <div id="eulerDownload">
+              <span href="#" class="square_btn" onclick="down()" >Download</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab_content" id="programming_content">
+          <div class="tab_content_description">
+          </div>
+        </div>
+
+        <div class="tab_content" id="design_content">
+          <div class="tab_content_description">
+            <p class="c-txtsp">COMING SOON</p>
+          </div>
+        </div>
+
+        <div class="tab_content" id="SS_content">
+          <div class="tab_content_description">
+          </div>
+        </div>
+        <div class="tab_content" id="Yield_content">
+          <div class="tab_content_description">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PLOT -->
+    <div id="apply">
+      <button id="apply" class="square_btn">APPLY</button>
+      <!--<span href="#" class="square_btn" onclick="run()" >APPLY</span>-->
+    </div>
+
+    <data id="CubeVolume" value = "0"></data>
+    <div id="seekbar-Cube" style="width:300px;height:50px">Cube-volume</div>
+
+    <data id="CubeSpread" value = "1"></data>
+    <div id="seekbar-Cube-S" style="width:300px;height:50px">Cube-spread</div>
+
+    <data id="SVolume"  value = "0"></data>
+    <div id="seekbar-S" style="width:300px;height:50px">S-volume</div>
+
+    <data id="SSpread"  value = "1"></data>
+    <div id="seekbar-S-S" style="width:300px;height:50px">S-spread</div>
+
+    <div id="RandVolume" value = "0"></div>
+    <script type="text/javascript" src="./js/seekbarvar.js"> ></script>
+  </div>
+</body>
+</html>
